@@ -12,7 +12,10 @@ dependencies:
   flutter:
     sdk: flutter
 
-  cupertino_icons: ^1.0.2
+  cupertino_icons: 1.0.2
+  flame: 1.0.0-releasecandidate.13
+  flame_forge2d: 0.8.1-releasecandidate.13
+  flame_tiled: 0.1.0
 
 dev_dependencies:
   flutter_test:
