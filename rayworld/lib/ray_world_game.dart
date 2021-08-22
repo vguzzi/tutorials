@@ -2,7 +2,7 @@ import 'dart:ui';
 
 import 'package:flame/components.dart';
 import 'package:flame/game.dart';
-import 'package:rayworld/components/debug_text.dart';
+import 'components/debug_text.dart';
 
 import 'components/player.dart';
 import 'helpers/direction.dart';
