@@ -1,7 +1,13 @@
+import 'package:flame/flame.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'main_game_page.dart';
 
 Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Flame.device.fullScreen();
+  await SystemChrome.setEnabledSystemUIOverlays([]);
+
   runApp(const App());
 }
 

@@ -1,7 +1,7 @@
 import 'package:flame/game.dart';
 import 'package:flutter/material.dart';
 import 'components/joypad.dart';
-import 'game_loop.dart';
+import 'ray_world_game.dart';
 import 'helpers/direction.dart';
 
 class MainGamePage extends StatefulWidget {
@@ -12,7 +12,7 @@ class MainGamePage extends StatefulWidget {
 }
 
 class MainGameState extends State<MainGamePage> {
-  GameLoop gameLoop = GameLoop();
+  RayWorldGame game = RayWorldGame();
 
   @override
   Widget build(BuildContext context) {
@@ -20,13 +20,13 @@ class MainGameState extends State<MainGamePage> {
         backgroundColor: const Color.fromRGBO(0, 0, 0, 1),
         body: Stack(
           children: [
-            GameWidget(game: gameLoop),
+            GameWidget(game: game),
             Align(
               alignment: Alignment.bottomRight,
               child: Padding(
                 padding: const EdgeInsets.all(32.0),
-                child: Joypad(
-                    onDirectionChanged: gameLoop.onJoypadDirectionChanged),
+                child:
+                    Joypad(onDirectionChanged: game.onJoypadDirectionChanged),
               ),
             )
           ],
