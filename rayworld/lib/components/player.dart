@@ -1,31 +1,34 @@
 import 'package:flame/components.dart';
+import 'package:flame/geometry.dart';
+import 'world_collidable.dart';
 import '../helpers/direction.dart';
 import 'package:flame/sprite.dart';
 
-class Player extends SpriteAnimationComponent with HasGameRef {
+class Player extends SpriteAnimationComponent
+    with HasGameRef, Hitbox, Collidable {
   final double _playerSpeed = 300.0;
   final double _animationSpeed = 0.15;
+
   late final SpriteAnimation _runDownAnimation;
   late final SpriteAnimation _runLeftAnimation;
   late final SpriteAnimation _runUpAnimation;
   late final SpriteAnimation _runRightAnimation;
   late final SpriteAnimation _standingAnimation;
 
-  Direction direction = Direction.none;
+  Direction _direction = Direction.none;
+  Direction _collisionDirection = Direction.none;
+  bool _hasCollided = false;
 
   Player()
       : super(
           size: Vector2.all(50.0),
         ) {
-    anchor = Anchor.center;
+    addShape(HitboxRectangle());
   }
 
   @override
   Future<void> onLoad() async {
-    await loadAnimations();
-
-    animation = _standingAnimation;
-    position = gameRef.size / 2;
+    _loadAnimations().then((_) => {animation = _standingAnimation});
   }
 
   @override
@@ -34,11 +37,28 @@ class Player extends SpriteAnimationComponent with HasGameRef {
     movePlayer(delta);
   }
 
-  void onJoypadDirectionChanged(Direction direction) {
-    this.direction = direction;
+  @override
+  void onCollision(Set<Vector2> intersectionPoints, Collidable other) {
+    super.onCollision(intersectionPoints, other);
+
+    if (other is WorldCollidable) {
+      if (!_hasCollided) {
+        _hasCollided = true;
+        _collisionDirection = _direction;
+      }
+    }
   }
 
-  Future<void> loadAnimations() async {
+  @override
+  void onCollisionEnd(Collidable other) {
+    _hasCollided = false;
+  }
+
+  void onJoypadDirectionChanged(Direction direction) {
+    _direction = direction;
+  }
+
+  Future<void> _loadAnimations() async {
     final spriteSheet = SpriteSheet(
       image: await gameRef.images.load('player_spritesheet.png'),
       srcSize: Vector2(29.0, 32.0),
@@ -61,25 +81,26 @@ class Player extends SpriteAnimationComponent with HasGameRef {
   }
 
   void movePlayer(double delta) {
-    if (direction == Direction.up) {
+    if (_direction == Direction.up) {
       animation = _runUpAnimation;
       if (canPlayerMoveUp(delta)) {
-        position.add(Vector2(0, delta * -_playerSpeed));
+        moveUp(delta);
       }
-    } else if (direction == Direction.down) {
+    } else if (_direction == Direction.down) {
       animation = _runDownAnimation;
       if (canPlayerMoveDown(delta)) {
-        position.add(Vector2(0, delta * _playerSpeed));
+        moveDown(delta);
       }
-    } else if (direction == Direction.left) {
+    } else if (_direction == Direction.left) {
       animation = _runLeftAnimation;
       if (canPlayerMoveLeft(delta)) {
-        position.add(Vector2(delta * -_playerSpeed, 0));
+        moveLeft(delta);
       }
-    } else if (direction == Direction.right) {
+    } else if (_direction == Direction.right) {
       animation = _runRightAnimation;
+
       if (canPlayerMoveRight(delta)) {
-        position.add(Vector2(delta * _playerSpeed, 0));
+        moveRight(delta);
       }
     } else {
       animation = _standingAnimation;
@@ -87,18 +108,46 @@ class Player extends SpriteAnimationComponent with HasGameRef {
   }
 
   bool canPlayerMoveUp(double delta) {
-    return position.y + delta * -_playerSpeed > 0 + size.y / 2;
+    if (_hasCollided && _collisionDirection == Direction.up) {
+      return false;
+    }
+    return true;
   }
 
   bool canPlayerMoveDown(double delta) {
-    return (position.y + (delta * _playerSpeed)) < gameRef.size.y - size.y / 2;
+    if (_hasCollided && _collisionDirection == Direction.down) {
+      return false;
+    }
+    return true;
   }
 
   bool canPlayerMoveLeft(double delta) {
-    return (position.x + (delta * -_playerSpeed)) > 0 + size.x / 2;
+    if (_hasCollided && _collisionDirection == Direction.left) {
+      return false;
+    }
+    return true;
   }
 
   bool canPlayerMoveRight(double delta) {
-    return (position.x + (delta * _playerSpeed)) < gameRef.size.x - size.x / 2;
+    if (_hasCollided && _collisionDirection == Direction.right) {
+      return false;
+    }
+    return true;
+  }
+
+  void moveUp(double delta) {
+    position.add(Vector2(0, delta * -_playerSpeed));
+  }
+
+  void moveDown(double delta) {
+    position.add(Vector2(0, delta * _playerSpeed));
+  }
+
+  void moveLeft(double delta) {
+    position.add(Vector2(delta * -_playerSpeed, 0));
+  }
+
+  void moveRight(double delta) {
+    position.add(Vector2(delta * _playerSpeed, 0));
   }
 }
