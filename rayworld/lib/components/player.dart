@@ -83,16 +83,19 @@ class Player extends SpriteAnimationComponent
   void movePlayer(double delta) {
     if (_direction == Direction.up) {
       animation = _runUpAnimation;
+
       if (canPlayerMoveUp(delta)) {
         moveUp(delta);
       }
     } else if (_direction == Direction.down) {
       animation = _runDownAnimation;
+
       if (canPlayerMoveDown(delta)) {
         moveDown(delta);
       }
     } else if (_direction == Direction.left) {
       animation = _runLeftAnimation;
+
       if (canPlayerMoveLeft(delta)) {
         moveLeft(delta);
       }
