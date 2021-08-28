@@ -45,10 +45,4 @@ class RayWorldGame extends BaseGame with HasCollidables {
     collidable.height = rect.height;
     return collidable;
   }
-
-  String getDebugText() {
-    return 'Player position: x: ${_player.position.x.round()}' +
-        ' y: ${_player.position.y.round()}' +
-        '\n game size x: ${size.x.round()} y: ${size.y.round()}';
-  }
 }
