@@ -1,3 +1,31 @@
+/** Copyright (c) 2021 Razeware LLC
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.
+
+Notwithstanding the foregoing, you may not use, copy, modify, merge, publish,
+distribute, sublicense, create a derivative work, and/or sell copies of the
+Software in any work that is designed, intended, or marketed for pedagogical or
+instructional purposes related to programming, coding, application development,
+or information technology.  Permission for such use, copying, modification,
+merger, publication, distribution, sublicensing, creation of derivative works,
+or sale is expressly withheld.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+THE SOFTWARE. **/
+
 import 'package:flame/components.dart';
 import 'package:flame/geometry.dart';
 import 'world_collidable.dart';
@@ -15,7 +43,7 @@ class Player extends SpriteAnimationComponent
   late final SpriteAnimation _runRightAnimation;
   late final SpriteAnimation _standingAnimation;
 
-  Direction _direction = Direction.none;
+  Direction direction = Direction.none;
   Direction _collisionDirection = Direction.none;
   bool _hasCollided = false;
 
@@ -44,7 +72,7 @@ class Player extends SpriteAnimationComponent
     if (other is WorldCollidable) {
       if (!_hasCollided) {
         _hasCollided = true;
-        _collisionDirection = _direction;
+        _collisionDirection = direction;
       }
     }
   }
@@ -52,10 +80,6 @@ class Player extends SpriteAnimationComponent
   @override
   void onCollisionEnd(Collidable other) {
     _hasCollided = false;
-  }
-
-  void onJoypadDirectionChanged(Direction direction) {
-    _direction = direction;
   }
 
   Future<void> _loadAnimations() async {
@@ -81,57 +105,59 @@ class Player extends SpriteAnimationComponent
   }
 
   void movePlayer(double delta) {
-    if (_direction == Direction.up) {
-      animation = _runUpAnimation;
-
-      if (canPlayerMoveUp(delta)) {
-        moveUp(delta);
-      }
-    } else if (_direction == Direction.down) {
-      animation = _runDownAnimation;
-
-      if (canPlayerMoveDown(delta)) {
-        moveDown(delta);
-      }
-    } else if (_direction == Direction.left) {
-      animation = _runLeftAnimation;
-
-      if (canPlayerMoveLeft(delta)) {
-        moveLeft(delta);
-      }
-    } else if (_direction == Direction.right) {
-      animation = _runRightAnimation;
-
-      if (canPlayerMoveRight(delta)) {
-        moveRight(delta);
-      }
-    } else {
-      animation = _standingAnimation;
+    switch (direction) {
+      case Direction.up:
+        if (canPlayerMoveUp()) {
+          animation = _runUpAnimation;
+          moveUp(delta);
+        }
+        break;
+      case Direction.down:
+        if (canPlayerMoveDown()) {
+          animation = _runDownAnimation;
+          moveDown(delta);
+        }
+        break;
+      case Direction.left:
+        if (canPlayerMoveLeft()) {
+          animation = _runLeftAnimation;
+          moveLeft(delta);
+        }
+        break;
+      case Direction.right:
+        if (canPlayerMoveRight()) {
+          animation = _runRightAnimation;
+          moveRight(delta);
+        }
+        break;
+      case Direction.none:
+        animation = _standingAnimation;
+        break;
     }
   }
 
-  bool canPlayerMoveUp(double delta) {
+  bool canPlayerMoveUp() {
     if (_hasCollided && _collisionDirection == Direction.up) {
       return false;
     }
     return true;
   }
 
-  bool canPlayerMoveDown(double delta) {
+  bool canPlayerMoveDown() {
     if (_hasCollided && _collisionDirection == Direction.down) {
       return false;
     }
     return true;
   }
 
-  bool canPlayerMoveLeft(double delta) {
+  bool canPlayerMoveLeft() {
     if (_hasCollided && _collisionDirection == Direction.left) {
       return false;
     }
     return true;
   }
 
-  bool canPlayerMoveRight(double delta) {
+  bool canPlayerMoveRight() {
     if (_hasCollided && _collisionDirection == Direction.right) {
       return false;
     }
