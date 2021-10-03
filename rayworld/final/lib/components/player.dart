@@ -51,7 +51,7 @@ class Player extends SpriteAnimationComponent
       : super(
           size: Vector2.all(50.0),
         ) {
-    addShape(HitboxRectangle());
+    addHitbox(HitboxRectangle());
   }
 
   @override

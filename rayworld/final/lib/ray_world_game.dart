@@ -1,9 +1,8 @@
-import 'dart:collection';
 import 'dart:ui';
 
 import 'package:flame/components.dart';
 import 'package:flame/game.dart';
-import 'package:flame/keyboard.dart';
+import 'package:flame/input.dart';
 import 'package:flutter/services.dart';
 
 import 'components/player.dart';
@@ -14,10 +13,9 @@ import 'package:flutter/material.dart';
 
 import 'helpers/map_loader.dart';
 
-class RayWorldGame extends BaseGame with HasCollidables, KeyboardEvents {
+class RayWorldGame extends FlameGame with HasCollidables, KeyboardEvents {
   final Player _player = Player();
   final World _world = World();
-  final Queue<Direction> _directionStack = Queue<Direction>();
 
   @override
   Future<void> onLoad() async {
@@ -51,43 +49,27 @@ class RayWorldGame extends BaseGame with HasCollidables, KeyboardEvents {
   }
 
   @override
-  void onKeyEvent(RawKeyEvent event) {
+  KeyEventResult onKeyEvent(
+      RawKeyEvent event, Set<LogicalKeyboardKey> keysPressed) {
     final isKeyDown = event is RawKeyDownEvent;
-    final keyLabel = event.data.keyLabel;
-    Direction? keyDirection;
+    Direction? keyDirection = null;
 
-    switch (keyLabel) {
-      case 'UIKeyInputUpArrow':
-        keyDirection = Direction.up;
-        break;
-      case 'UIKeyInputLeftArrow':
-        keyDirection = Direction.left;
-        break;
-      case 'UIKeyInputRightArrow':
-        keyDirection = Direction.right;
-        break;
-      case 'UIKeyInputDownArrow':
-        keyDirection = Direction.down;
-        break;
+    if (event.logicalKey == LogicalKeyboardKey.keyA) {
+      keyDirection = Direction.left;
+    } else if (event.logicalKey == LogicalKeyboardKey.keyD) {
+      keyDirection = Direction.right;
+    } else if (event.logicalKey == LogicalKeyboardKey.keyW) {
+      keyDirection = Direction.up;
+    } else if (event.logicalKey == LogicalKeyboardKey.keyS) {
+      keyDirection = Direction.down;
     }
 
-    if (keyDirection != null) {
-      if (isKeyDown) {
-        _directionStack.addFirst(keyDirection);
-        _player.direction = keyDirection;
-      } else {
-        _directionStack.remove(keyDirection);
-
-        if (_player.direction == keyDirection) {
-          var direction = Direction.none;
-
-          if (_directionStack.isNotEmpty) {
-            direction = _directionStack.first;
-          }
-
-          _player.direction = direction;
-        }
-      }
+    if (isKeyDown && keyDirection != null) {
+      _player.direction = keyDirection;
+    } else if (_player.direction == keyDirection) {
+      _player.direction = Direction.none;
     }
+
+    return super.onKeyEvent(event, keysPressed);
   }
 }
