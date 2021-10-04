@@ -32,6 +32,6 @@ import 'package:flame/geometry.dart';
 class WorldCollidable extends PositionComponent
     with HasGameRef, Hitbox, Collidable {
   WorldCollidable() {
-    addShape(HitboxRectangle());
+    addHitbox(HitboxRectangle());
   }
 }
