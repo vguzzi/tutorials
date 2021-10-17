@@ -56,6 +56,7 @@ class Player extends SpriteAnimationComponent
 
   @override
   Future<void> onLoad() async {
+    super.onLoad();
     _loadAnimations().then((_) => {animation = _standingAnimation});
   }
 
