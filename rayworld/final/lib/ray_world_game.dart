@@ -19,6 +19,7 @@ class RayWorldGame extends FlameGame with HasCollidables, KeyboardEvents {
 
   @override
   Future<void> onLoad() async {
+    super.onLoad();
     await add(_world);
     add(_player);
     addWorldCollision();
